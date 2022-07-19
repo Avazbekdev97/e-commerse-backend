@@ -1,28 +1,11 @@
-const Category = require('../models/category.js')
+const { addCategory, getCategory } = require('../controllers/category.js')
+const { requireSignin, adminMiddleware } = require('../common-middleware/index.js')
 const express = require('express')
-const slugify = require('slugify')
 const router = express.Router()
 
 
-router.post('/category/create', (req, res) => {
-    
-    const categoryObj = {
-        name: req.body.name,
-        slug: slugify(req.body.name)
-    }
-
-    if(req.body.parentId) {
-        categoryObj.parentId = req.body.parentId
-    }
-
-    const cat = new Category(categoryObj)
-    cat.save((error, category) => {
-        if(error) return res.status(400).json({ error })
-        
-        if(category) return res.status(201).json({ category })
-    })
-
-})
+router.post('/category/create', requireSignin, adminMiddleware, addCategory)
+router.get('/category/getCategory', getCategory)
 
 
 module.exports = router

@@ -4,9 +4,11 @@ const env = require('dotenv')
 const app = express()
 
 //routes
-const authRoutes = require('./routes/auth.js')
-const adminRoutes = require('./routes/admin/auth.js')
 const categoryRoutes = require('./routes/category.js')
+const adminRoutes = require('./routes/admin/auth.js')
+const productRoutes = require('./routes/product.js')
+const authRoutes = require('./routes/auth.js')
+const cartRoutes = require('./routes/cart.js')
 
 //environment variable or you can say constants  
 env.config()
@@ -30,8 +32,10 @@ mongoose.connect(
 
 
 app.use(express.json()) 
-app.use('/api', authRoutes)
-app.use('/api', adminRoutes)
 app.use('/api', categoryRoutes)
+app.use('/api', productRoutes)
+app.use('/api', adminRoutes)
+app.use('/api', authRoutes)
+app.use('/api', cartRoutes)
 
 app.listen(process.env.PORT, () => console.log(`Server is running on http://localhost:${process.env.PORT}`))

@@ -26,7 +26,7 @@ exports.signup = (req, res) => {
          
          _user.save((error, data) => {
             if(error) {
-                console.log(error.message);
+                
                 return res.status(400).json({
                     message: error.message
                 })
@@ -45,7 +45,7 @@ exports.signup = (req, res) => {
 }
 
 exports.signin = (req, res) => {
-   
+    
     User.findOne({ email: req.body.email })
     .exec((error, user) => {
         
@@ -54,7 +54,7 @@ exports.signin = (req, res) => {
         if(user) {
 
             if(user.authenticate(req.body.password, user.hashed_password) && user.role === 'admin') {
-               const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET, { expiresIn: '1h' })
+               const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' })
                const { _id, firstName, lastName, email, role, fullName } = user
                res.status(200).json({
                 token,
