@@ -1,9 +1,11 @@
 const User = require('../../models/user.js')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+const shortid = require('shortid')
 
 exports.signup = (req, res) => {    
     User.findOne({ email: req.body.email })
-    .exec((user) => {
+    .exec(async (user) => {
         if(user) return res.status(400).json({
             message: "Admin already registered"
         })
@@ -15,12 +17,14 @@ exports.signup = (req, res) => {
             password
         } = req.body;
         
+        const hashed_password = await bcrypt.hash(password, 10)
+
         const _user = new User({ 
             firstName, 
             lastName, 
-            email, 
-            password,
-            userName: Math.random().toString(),
+            email,
+            hashed_password, 
+            userName: shortid.generate(),
             role: 'admin'
          });
          
@@ -52,10 +56,11 @@ exports.signin = (req, res) => {
         if(error) return res.status(400).json({ error })
        
         if(user) {
-
+            
             if(user.authenticate(req.body.password, user.hashed_password) && user.role === 'admin') {
-               const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' })
+               const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1d' })
                const { _id, firstName, lastName, email, role, fullName } = user
+               res.cookie('token', token, { expiresIn: '1d' })
                res.status(200).json({
                 token,
                 user: {
@@ -75,3 +80,12 @@ exports.signin = (req, res) => {
     })
 }
 
+
+exports.signout = (req, res) => {
+
+    res.clearCookie('token')
+    res.status(200).json({
+        message: 'Signout successfully...!'
+    })
+
+}

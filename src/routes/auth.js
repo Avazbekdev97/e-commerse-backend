@@ -3,7 +3,7 @@ const { validateSignUpRequest, validateSigninRequest, isRequestValidate } = requ
 const { check } = require('express-validator')
 const express = require('express')
 const router = express.Router()
-console.log(check);
+
 router.post('/signup', validateSignUpRequest, isRequestValidate, signup)
 
 router.post('/signin', validateSigninRequest, isRequestValidate, signin)
